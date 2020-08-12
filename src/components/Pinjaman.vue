@@ -84,7 +84,7 @@ export default {
       return `Rp ${this.rupiah(
         +this.$store.state.detil.limitKartu
       )},- s/d Rp ${this.rupiah(+this.$store.state.detil.batasLimit)}`;
-    }
+    },
   },
   created() {
     // console.log(this.$router);
@@ -101,14 +101,14 @@ export default {
       console.log(payload);
       let input = {
         kartuID: +payload.id,
-        jenis: payload.jenis
+        jenis: payload.jenis,
       };
 
       instance
         .post(`/pinjamans/kartu-kredit`, input, {
           headers: {
-            token: localStorage.getItem("token")
-          }
+            token: localStorage.getItem("token"),
+          },
         })
         .then(({ data }) => {
           console.log(data);
@@ -118,7 +118,7 @@ export default {
           // // this.$store.commit("LOGIN");
           // // this.dialog = false;
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err.response.data);
           // localStorage.removeItem("token");
           // localStorage.removeItem("email");
@@ -126,7 +126,7 @@ export default {
         });
     },
 
-    isNumber: function() {
+    isNumber: function () {
       // console.log(evt, "tes")
       let evt = window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
@@ -202,8 +202,8 @@ export default {
       else if (g < 0) g = 0;
 
       return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
-    }
-  }
+    },
+  },
 };
 </script>
 <style scoped>

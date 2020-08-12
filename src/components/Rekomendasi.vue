@@ -17,7 +17,7 @@
           {{this.visible + this.scrollY}}
           {{this.pageHeight}}
           {{this.add}}
-        </v-subheader> -->
+        </v-subheader>-->
         <v-flex fluid style="margin-right:0px;">
           <CardBank
             v-for="(selectOption, indexOpt) in filteredList"
@@ -62,22 +62,26 @@ export default {
             props: {
               boilerplate: false,
               elevation: 0,
-              ...props
-            }
+              ...props,
+            },
           },
           children
         );
-      }
-    }
+      },
+    },
   },
 
   mounted() {
     this.onResize();
-    this.scroll(this.pinjaman_all);
-    this.$store.dispatch("GET_PINJAMAN_ALL_LIMIT", [0, this.get]);
+    if (!this.$store.state.filter) {
+      this.scroll(this.pinjaman_all);
+      this.$store.dispatch("GET_PINJAMAN_ALL_LIMIT", [0, this.get]);
+    }
   },
   created() {
-    this.$store.state.pinjaman_all = [];
+    if (!this.$store.state.filter) {
+      this.$store.state.pinjaman_all = [];
+    }
     // window.addEventListener("scroll", () => {
     //   this.bottom = this.bottomVisible();
     // });
@@ -95,11 +99,9 @@ export default {
     ...mapState(["credit", "pinjaman_all"]),
     filteredList() {
       var lowSearch = this.$store.state.newSearching.toLowerCase();
-      return this.pinjaman_all.filter(function(wine) {
-        return Object.values(wine).some(val =>
-          String(val)
-            .toLowerCase()
-            .includes(lowSearch)
+      return this.pinjaman_all.filter(function (wine) {
+        return Object.values(wine).some((val) =>
+          String(val).toLowerCase().includes(lowSearch)
         );
       });
     },
@@ -138,11 +140,11 @@ export default {
         // i++
       }
       return i;
-    }
+    },
   },
   watch: {
     bottom(bottom) {
-      if (bottom) {
+      if (bottom && !this.$store.state.filter) {
         console.log(bottom, "terus");
         this.add += this.get;
         let sebelum = this.add;
@@ -151,7 +153,7 @@ export default {
         this.$store.state.loader = true;
         this.$store.dispatch("GET_PINJAMAN_ALL_LIMIT", [sebelum, this.add]);
       }
-    }
+    },
   },
   methods: {
     onScroll() {
@@ -198,7 +200,7 @@ export default {
     },
     next() {
       this.$store.commit("NEXT", "akun");
-    }
+    },
   },
   data: () => ({
     amount: 0,
@@ -222,7 +224,7 @@ export default {
         total: "Rp 1.000.000,- s/d Rp 4.000.000",
         avatar:
           "https://cdn.zeplin.io/5ee861a7486d3d9a9c57754b/assets/99FB8B36-9D73-42FD-8453-57183EFA82F1.png",
-        bunga: "3% s/d 7%"
+        bunga: "3% s/d 7%",
       },
       {
         bank: "BCA",
@@ -230,7 +232,7 @@ export default {
         total: "Rp 1.000.000,- s/d Rp 4.000.000",
         avatar:
           "https://cdn.zeplin.io/5ee861a7486d3d9a9c57754b/assets/99FB8B36-9D73-42FD-8453-57183EFA82F1.png",
-        bunga: "3% s/d 7%"
+        bunga: "3% s/d 7%",
       },
       {
         bank: "BCA",
@@ -238,7 +240,7 @@ export default {
         total: "Rp 1.000.000,- s/d Rp 4.000.000",
         avatar:
           "https://cdn.zeplin.io/5ee861a7486d3d9a9c57754b/assets/99FB8B36-9D73-42FD-8453-57183EFA82F1.png",
-        bunga: "3% s/d 7%"
+        bunga: "3% s/d 7%",
       },
       {
         bank: "Uang Teman",
@@ -246,7 +248,7 @@ export default {
         total: "Rp 500.000,- s/d Rp 8.000.000",
         avatar:
           "https://cdn.zeplin.io/5ee861a7486d3d9a9c57754b/assets/FE309305-9C1A-43EF-9D5F-3EF93A368E30.png",
-        bunga: "12% s/d 20%"
+        bunga: "12% s/d 20%",
       },
       {
         bank: "Pintek",
@@ -254,16 +256,16 @@ export default {
         total: "Rp 5000.000,- s/d Rp 2.000.000",
         avatar:
           "https://cdn.zeplin.io/5ee861a7486d3d9a9c57754b/assets/7A1375CE-9D0F-4003-8EF9-E7CAB4C91709.png",
-        bunga: "15% s/d 24%"
-      }
+        bunga: "15% s/d 24%",
+      },
     ],
     showStepper: false,
     gaji: 0,
     windowSize: {
       x: 0,
-      y: 0
-    }
-  })
+      y: 0,
+    },
+  }),
 };
 </script>
 <style scoped>

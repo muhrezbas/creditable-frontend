@@ -52,26 +52,13 @@
                 flat
               >
                 <v-btn
-                  style="  
-                margin-right: 5px;
-              width: 90px;
-              height: 35px;
-              border-radius: 20px;
-              border: solid 1px #ec5091;
-              background-color: #ffffff;
-             
-              font-family: Avenir;
-              font-size: 12px;
-              font-weight: 300;
-              font-stretch: normal;
-              font-style: normal;
-              line-height: 1.33;
-              letter-spacing: -0.24px;
-              text-align: left;
-              color: #264d6a;
-                          "
-                  @click="goToDetil(selectOption.id)"
-                  v-for="(selectOption, indexOpt) in $store.state.mitras"
+                  class="button-institusi"
+                  v-bind:style="{ 'background-color': kategori.includes(selectOption.value)?'#ec5091':'#FFFFFF',
+                                  'border': kategori.includes(selectOption.value) ? ''  :'solid 1px #ec5091',
+                                  'color': kategori.includes(selectOption.value) ? 'white' :'#264d6a'}"
+                  style="background-color: #ffffff;"
+                  @click="selectKategori(selectOption.value)"
+                  v-for="(selectOption, indexOpt) in kategoriPinjaman"
                   :key="indexOpt"
                 >{{selectOption.name}}</v-btn>
               </v-card>
@@ -275,6 +262,7 @@
 </template>
 
 <script>
+import instance from "../myconfig";
 export default {
   data() {
     return {
@@ -289,10 +277,15 @@ export default {
         pertama: new Date().toISOString().substr(0, 10),
       },
       institusi: [],
+      kategori: [],
       tenor: "hari",
       min: 0,
       max: 1000000000,
       bungaMin: 0,
+      kategoriPinjaman: [
+        { name: "Kartu Kredit", value: "kartuKredit" },
+        { name: "KTA", value: "kreditTanpaAgunan" },
+      ],
       bungaMax: 100,
       tenorMin: 0,
       tenorMax: 8760,
@@ -342,6 +335,17 @@ export default {
       }
       console.log(this.institusi);
     },
+    selectKategori(payload) {
+      console.log(payload);
+      let tes = this.kategori.findIndex((data) => data === payload);
+      console.log(tes, "keluar apa");
+      if (tes == -1) {
+        this.kategori.push(payload);
+      } else if (tes !== -1) {
+        this.kategori.splice(tes, 1);
+      }
+      console.log(this.kategori);
+    },
     ngetik() {
       // console.log(this.gaji);
 
@@ -351,15 +355,63 @@ export default {
       this.show = true;
     },
     next() {
-      let temp = this.$store.state.simulasi;
-      temp.bank = this.keuangan.bank;
-      temp.loan = this.keuangan.loan;
-      temp.tenor = this.keuangan.tenor;
-      temp.bunga = this.keuangan.bunga;
-      temp.pertama = this.keuangan.pertama;
-      console.log(temp, "tes");
-      this.$store.commit("SIMULASI", temp);
-      this.$router.push({ path: "/result-simulasi" });
+      // console.log(this.range);
+      let obj = {
+        jenis: this.kategori,
+        mitra: this.institusi,
+        nominal: [this.range[0], this.range[1]],
+        bunga: [this.rangeBunga[0], this.rangeBunga[1]],
+        tenor: [this.rangeTenor[0], this.rangeTenor[1], this.tenor],
+      };
+      instance
+        .post(`/pinjamans/filter`, obj, {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        })
+        .then(({ data }) => {
+          console.log(data, "FILTER");
+          this.$store.commit("SET_PINJAMAN_ALL_LIMIT", data);
+          this.$router.push({ path: "/rekomendasi" });
+          this.$store.state.filter = true
+          // console.log(context.state.pinjaman_all, "all");
+          // let payload = context.state.pinjaman_all.concat(data);
+
+          // context.questions = data;
+          // context.commit("SET_PINJAMAN_ALL_LIMIT", payload);
+          // console.log(context.questions);
+        })
+        .catch(function (error) {
+          // localStorage.removeItem("token");
+          // localStorage.removeItem("email");
+          // context.commit("LOGOUT");
+          console.log(error, "why");
+        });
+
+      console.log(obj);
+      //       {
+      //     "jenis": [
+      //         "kartuKredit",
+      //         "kreditTanpaAgunan"
+      //     ],
+      //      "mitra": [
+      //         "5718746756808704",
+      //         "5138716758638592"
+      //     ],
+      //     "nominal": [
+      //         0,
+      //         100000000
+      //     ],
+      //     "bunga": [
+      //         0,
+      //         9
+      //     ],
+      //     "tenor": [
+      //         1,
+      //         3,
+      //         "bulan"
+      //     ]
+      // }
     },
     isNumber: function () {
       // console.log(evt, "tes")

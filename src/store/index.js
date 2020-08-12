@@ -18,6 +18,7 @@ export default new Vuex.Store({
     pinjaman_berjalan: [],
     kartuKredits: [],
     provinces: [],
+    filter: false,
     kotas: [],
     pendidikans: [],
     pengalamans: [],
@@ -27,7 +28,7 @@ export default new Vuex.Store({
     pekerjaans: [],
     detil: {},
     pinjaman_all: [],
-    mitras:[],
+    mitras: [],
     incomplete: {
     },
     profil: {
@@ -123,6 +124,8 @@ export default new Vuex.Store({
       state.pinjaman_berjalan = payload
     },
     SET_PINJAMAN_ALL_LIMIT(state, payload) {
+      console.log(payload)
+      state.loader = false
       state.pinjaman_all = payload
     },
     SET_PINJAMAN_ALL(state, payload) {
@@ -194,7 +197,7 @@ export default new Vuex.Store({
           }
         })
         .then(({ data }) => {
-          context.commit("SET_LOADER")
+     
           console.log(data, "LIMIT");
           console.log(context.state.pinjaman_all, "all")
           let payload = context.state.pinjaman_all.concat(data)
@@ -459,7 +462,7 @@ export default new Vuex.Store({
           }
         })
         .then(({ data }) => {
-          console.log(data, "disini");
+          console.log(data, "disini mitra");
           // context.questions = data;
           context.commit("SET_MITRAS", data.entities)
           // console.log(context.questions);
